@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.renderscript.Type;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Bitmap bmOriginal = BitmapFactory.decodeResource(getResources(), R.drawable.download);
-        //Bitmap bmOriginal = decodeSampledBitmapFromResource(getResources(), R.drawable.usr, 100, 100);
+//        Bitmap bmOriginal = decodeSampledBitmapFromResource(getResources(), R.drawable.download, 100, 100);
 
         target = (ImageView) findViewById(R.id.iv_target);
         target.setImageBitmap(bmOriginal);
