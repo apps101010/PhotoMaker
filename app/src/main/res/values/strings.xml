@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">PhotoMaker</string>
+    <string name="photo_sketch_maker">Photo Sketch Maker</string>
+    <string name="choose_image">Choose Image</string>
 </resources>
