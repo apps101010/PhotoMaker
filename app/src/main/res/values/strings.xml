@@ -2,4 +2,15 @@
     <string name="app_name">PhotoMaker</string>
     <string name="photo_sketch_maker">Photo Sketch Maker</string>
     <string name="choose_image">Choose Image</string>
+    <string name="original">Original</string>
+    <string name="sketch_1">Sketch 1</string>
+    <string name="sketch_2">Sketch 2</string>
+    <string name="sketch_3">Sketch 3</string>
+    <string name="sketch_4">Sketch 4</string>
+    <string name="sketch_5">Sketch 5</string>
+    <string name="sketch_6">Sketch 6</string>
+    <string name="sketch_7">Sketch 7</string>
+    <string name="sketch_8">Sketch 8</string>
+    <string name="sketch_9">Sketch 9</string>
+    <string name="b_w"><![CDATA[B & W]]></string>
 </resources>

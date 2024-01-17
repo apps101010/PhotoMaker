@@ -36,21 +36,10 @@
         android:background="@drawable/border"
         android:layout_above="@+id/fixLayout">
 
-<!--        <ImageView-->
-<!--            android:src="@drawable/download"-->
-<!--            android:layout_width="150dp"-->
-<!--            android:layout_height="150dp" />-->
-
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-<!--            <ImageView-->
-<!--                android:id="@+id/iv_target"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:src="@drawable/download"-->
-<!--                android:maxHeight="10dp"/>-->
 
             <LinearLayout
                 android:id="@+id/chooseImageLayout"
@@ -105,6 +94,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:visibility="gone"
         android:layout_alignParentBottom="true">
 
         <TextView
@@ -128,7 +118,7 @@
             app:tabSelectedTextColor="@android:color/white"
             app:tabTextColor="@android:color/white"
             app:tabIndicatorColor="@color/design_default_color_on_secondary"
-            app:tabIndicatorHeight="2dp"
+            app:tabIndicatorHeight="1dp"
             app:tabMode="scrollable"
             android:layout_marginBottom="10dp"
             app:tabPaddingStart="0dp"

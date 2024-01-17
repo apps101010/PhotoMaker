@@ -2,17 +2,23 @@ package com.photo.photomaker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.renderscript.Type;
 import android.view.View;
@@ -46,110 +52,73 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int STORAGE_PERMISSION_CODE = 777;
     private static final int GALLERY_PICKER_CODE = 888;
-    private SketchImage sketchImage;
+    private SketchImage sketchImage,sketchImage1;
     private int MAX_PROGRESS = 100;
     private int effectType = SketchImage.ORIGINAL_TO_GRAY;
     private String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE};
     private String imageFileName = null;
     private Bitmap imageBitmap;
     private Uri compressedUri;
+    private TabLayout tabLayout;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Please Wait...");
+        progressDialog.setCancelable(false);
 
-        Bitmap bmOriginal = BitmapFactory.decodeResource(getResources(), R.drawable.download);
+         tabLayout =  binding.tabLayout;
 
-        binding.ivTarget.setImageBitmap(bmOriginal);
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
 
-        sketchImage = new SketchImage.Builder(this, bmOriginal).build();
-
-        binding.tvPb.setText(String.format("%d %%", MAX_PROGRESS));
-        binding.simpleSeekBar.setMax(MAX_PROGRESS);
-        binding.simpleSeekBar.setProgress(MAX_PROGRESS);
-        binding.ivTarget.setImageBitmap(sketchImage.getImageAs(effectType,
-                MAX_PROGRESS));
-
-        final TabLayout tabLayout =  binding.tabLayout;
-//        tabLayout.addTab(tabLayout.newTab().setText("Original to Gray"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Original to Sketch"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Original to Colored Sketch"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Original to Soft Sketch"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Original to Soft Color Sketch"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Gray to Sketch"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Gray to Colored Sketch"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Gray to Soft Sketch"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Gray to Soft Color Sketch"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Sketch to Color Sketch"));
-
-        // Add tabs with custom views
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
-        // Add more tabs as needed
-
-        // Set images for each tab
-        ImageView tabImage1 = tabLayout.getTabAt(0).getCustomView().findViewById(R.id.tabImage);
-        tabImage1.setImageResource(R.drawable.download);
-
-        ImageView tabImage2 = tabLayout.getTabAt(1).getCustomView().findViewById(R.id.tabImage);
-        tabImage2.setImageBitmap(sketchImage.getImageAs(SketchImage.ORIGINAL_TO_GRAY,
-                MAX_PROGRESS));
-        ImageView tabImage3 = tabLayout.getTabAt(2).getCustomView().findViewById(R.id.tabImage);
-        tabImage3.setImageBitmap(sketchImage.getImageAs(SketchImage.ORIGINAL_TO_SKETCH,
-                MAX_PROGRESS));
-        ImageView tabImage4 = tabLayout.getTabAt(3).getCustomView().findViewById(R.id.tabImage);
-        tabImage4.setImageBitmap(sketchImage.getImageAs(SketchImage.ORIGINAL_TO_COLORED_SKETCH,
-                MAX_PROGRESS));
-        ImageView tabImage5 = tabLayout.getTabAt(4).getCustomView().findViewById(R.id.tabImage);
-        tabImage5.setImageBitmap(sketchImage.getImageAs(SketchImage.ORIGINAL_TO_SOFT_COLOR_SKETCH,
-                MAX_PROGRESS));
-        ImageView tabImage6 = tabLayout.getTabAt(5).getCustomView().findViewById(R.id.tabImage);
-        tabImage6.setImageBitmap(sketchImage.getImageAs(SketchImage.GRAY_TO_SKETCH,
-                MAX_PROGRESS));
-        ImageView tabImage7 = tabLayout.getTabAt(6).getCustomView().findViewById(R.id.tabImage);
-        tabImage7.setImageBitmap(sketchImage.getImageAs(SketchImage.GRAY_TO_COLORED_SKETCH,
-                MAX_PROGRESS));
-        ImageView tabImage8 = tabLayout.getTabAt(7).getCustomView().findViewById(R.id.tabImage);
-        tabImage8.setImageBitmap(sketchImage.getImageAs(SketchImage.GRAY_TO_SOFT_SKETCH,
-                MAX_PROGRESS));
-        ImageView tabImage9 = tabLayout.getTabAt(8).getCustomView().findViewById(R.id.tabImage);
-        tabImage9.setImageBitmap(sketchImage.getImageAs(SketchImage.GRAY_TO_SOFT_COLOR_SKETCH,
-                MAX_PROGRESS));
-        ImageView tabImage10 = tabLayout.getTabAt(9).getCustomView().findViewById(R.id.tabImage);
-        tabImage10.setImageBitmap(sketchImage.getImageAs(SketchImage.SKETCH_TO_COLOR_SKETCH,
-                MAX_PROGRESS));
-//        ImageView tabImage2 = tabLayout.getTabAt(1).getCustomView().findViewById(R.id.tabImage);
-//        tabImage2.setImageBitmap(sketchImage.getImageAs(SketchImage.ORIGINAL_TO_SKETCH,
-//                MAX_PROGRESS));
-
+       setImagesForEachTab();
 
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                binding.pb.setVisibility(View.VISIBLE);
                 effectType = tabLayout.getSelectedTabPosition();
                 if (effectType == 0){
                     binding.tvPb.setText(String.format("%d %%", MAX_PROGRESS));
                     binding.simpleSeekBar.setMax(MAX_PROGRESS);
                     binding.simpleSeekBar.setProgress(MAX_PROGRESS);
-                    binding.ivTarget.setImageResource(R.drawable.download);
-                }else {
-                    binding.tvPb.setText(String.format("%d %%", MAX_PROGRESS));
-                    binding.simpleSeekBar.setMax(MAX_PROGRESS);
-                    binding.simpleSeekBar.setProgress(MAX_PROGRESS);
-                    binding.ivTarget.setImageBitmap(sketchImage.getImageAs(effectType-1,
-                            MAX_PROGRESS));
+                    binding.ivTarget.setImageBitmap(imageBitmap);
+                    binding.pb.setVisibility(View.GONE);
+                }else if (effectType == 1){
+                    backgroundTasks(1,true,100);
+                }else if (effectType == 2){
+                    backgroundTasks(9,true,100);
+                }else if (effectType == 3){
+                    backgroundTasks(5,true,100);
+                }else if (effectType == 4){
+                    backgroundTasks(4,true,100);
+                }else if (effectType == 5){
+                    backgroundTasks(6,true,100);
+                }else if (effectType == 6){
+                    backgroundTasks(7,true,100);
+                }else if (effectType == 7){
+                    backgroundTasks(2,true,100);
+                }else if (effectType == 8){
+                    backgroundTasks(8,true,100);
+                }else if (effectType == 9){
+                    backgroundTasks(3,true,100);
+                }else{
+                    backgroundTasks(0,true,100);
                 }
 
             }
@@ -179,9 +148,31 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                binding.pb.setVisibility(View.INVISIBLE);
-                binding.ivTarget.setImageBitmap(sketchImage.getImageAs(effectType-1,
-                        seekBar.getProgress()));
+//                binding.pb.setVisibility(View.INVISIBLE);
+
+                if (effectType == 0){
+                    binding.ivTarget.setImageBitmap(imageBitmap);
+                }else if (effectType == 1){
+                    backgroundTasks(1,false,seekBar.getProgress());
+                }else if (effectType == 2){
+                    backgroundTasks(9,false,seekBar.getProgress());
+                }else if (effectType == 3){
+                    backgroundTasks(5,false,seekBar.getProgress());
+                }else if (effectType == 4){
+                    backgroundTasks(4,false,seekBar.getProgress());
+                }else if (effectType == 5){
+                    backgroundTasks(6,false,seekBar.getProgress());
+                }else if (effectType == 6){
+                    backgroundTasks(7,false,seekBar.getProgress());
+                }else if (effectType == 7){
+                    backgroundTasks(2,false,seekBar.getProgress());
+                }else if (effectType == 8){
+                    backgroundTasks(8,false,seekBar.getProgress());
+                }else if (effectType == 9){
+                    backgroundTasks(3,false,seekBar.getProgress());
+                }else{
+                    backgroundTasks(0,false,seekBar.getProgress());
+                }
             }
         });
 
@@ -198,6 +189,134 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             }
         });
 
+    }
+
+
+    private void backgroundTasks(int type,boolean status,int progress){
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Perform heavy computations in the background
+                Bitmap resultBitmap;
+                if (status){
+                      resultBitmap = sketchImage.getImageAs(type, MAX_PROGRESS);
+                }else {
+                      resultBitmap = sketchImage.getImageAs(type, progress);
+
+                }
+
+
+                // Post the result back to the main thread
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (status){
+                            binding.tvPb.setText(String.format("%d %%", MAX_PROGRESS));
+                            binding.simpleSeekBar.setMax(MAX_PROGRESS);
+                            binding.simpleSeekBar.setProgress(MAX_PROGRESS);
+                            binding.ivTarget.setImageBitmap(resultBitmap);
+                            binding.pb.setVisibility(View.GONE);
+                        }else {
+                            binding.ivTarget.setImageBitmap(resultBitmap);
+                            binding.pb.setVisibility(View.GONE);
+                        }
+
+                    }
+                });
+            }
+        }).start();
+
+    }
+
+    private void setImagesForEachTab() {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bmOriginal = BitmapFactory.decodeResource(getResources(), R.drawable.download);
+
+                sketchImage1 = new SketchImage.Builder(MainActivity.this, bmOriginal).build();
+
+                Bitmap tabImage2Bitmap = sketchImage1.getImageAs(SketchImage.ORIGINAL_TO_SKETCH, MAX_PROGRESS);
+                Bitmap tabImage3Bitmap = sketchImage1.getImageAs(SketchImage.ORIGINAL_TO_COLORED_SKETCH, MAX_PROGRESS);
+                Bitmap tabImage4Bitmap = sketchImage1.getImageAs(SketchImage.GRAY_TO_SKETCH, MAX_PROGRESS);
+                Bitmap tabImage5Bitmap = sketchImage1.getImageAs(SketchImage.ORIGINAL_TO_SOFT_COLOR_SKETCH, MAX_PROGRESS);
+                Bitmap tabImage6Bitmap = sketchImage1.getImageAs(SketchImage.GRAY_TO_COLORED_SKETCH, MAX_PROGRESS);
+                Bitmap tabImage7Bitmap = sketchImage1.getImageAs(SketchImage.GRAY_TO_SOFT_SKETCH, MAX_PROGRESS);
+                Bitmap tabImage8Bitmap = sketchImage1.getImageAs(SketchImage.SKETCH_TO_COLOR_SKETCH, MAX_PROGRESS);
+                Bitmap tabImage9Bitmap = sketchImage1.getImageAs(SketchImage.GRAY_TO_SOFT_COLOR_SKETCH, MAX_PROGRESS);
+                Bitmap tabImage10Bitmap = sketchImage1.getImageAs(SketchImage.ORIGINAL_TO_SOFT_SKETCH, MAX_PROGRESS);
+                Bitmap tabImage11Bitmap = sketchImage1.getImageAs(SketchImage.ORIGINAL_TO_GRAY, MAX_PROGRESS);
+
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        binding.tvPb.setText(String.format("%d %%", MAX_PROGRESS));
+                        binding.simpleSeekBar.setMax(MAX_PROGRESS);
+                        binding.simpleSeekBar.setProgress(MAX_PROGRESS);
+                        binding.ivTarget.setImageBitmap(sketchImage1.getImageAs(effectType,
+                                MAX_PROGRESS));
+
+                        ImageView tabImage1 = tabLayout.getTabAt(0).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName1 = tabLayout.getTabAt(0).getCustomView().findViewById(R.id.tabName);
+                        tabImage1.setImageResource(R.drawable.download);
+                        tabName1.setText(R.string.original);
+
+                        ImageView tabImage2 = tabLayout.getTabAt(1).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName2 = tabLayout.getTabAt(1).getCustomView().findViewById(R.id.tabName);
+                        tabImage2.setImageBitmap(tabImage2Bitmap);
+                        tabName2.setText(R.string.sketch_1);
+
+                        ImageView tabImage3 = tabLayout.getTabAt(2).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName3 = tabLayout.getTabAt(2).getCustomView().findViewById(R.id.tabName);
+                        tabImage3.setImageBitmap(tabImage3Bitmap);
+                        tabName3.setText(R.string.sketch_2);
+
+                        ImageView tabImage4 = tabLayout.getTabAt(3).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName4 = tabLayout.getTabAt(3).getCustomView().findViewById(R.id.tabName);
+                        tabImage4.setImageBitmap(tabImage4Bitmap);
+                        tabName4.setText(R.string.sketch_3);
+
+                        ImageView tabImage5 = tabLayout.getTabAt(4).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName5 = tabLayout.getTabAt(4).getCustomView().findViewById(R.id.tabName);
+                        tabImage5.setImageBitmap(tabImage5Bitmap);
+                        tabName5.setText(R.string.sketch_4);
+
+                        ImageView tabImage6 = tabLayout.getTabAt(5).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName6 = tabLayout.getTabAt(5).getCustomView().findViewById(R.id.tabName);
+                        tabImage6.setImageBitmap(tabImage6Bitmap);
+                        tabName6.setText(R.string.sketch_5);
+
+                        ImageView tabImage7 = tabLayout.getTabAt(6).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName7 = tabLayout.getTabAt(6).getCustomView().findViewById(R.id.tabName);
+                        tabImage7.setImageBitmap(tabImage7Bitmap);
+                        tabName7.setText(R.string.sketch_6);
+
+                        ImageView tabImage8 = tabLayout.getTabAt(7).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName8 = tabLayout.getTabAt(7).getCustomView().findViewById(R.id.tabName);
+                        tabImage8.setImageBitmap(tabImage8Bitmap);
+                        tabName8.setText(R.string.sketch_7);
+
+                        ImageView tabImage9 = tabLayout.getTabAt(8).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName9 = tabLayout.getTabAt(8).getCustomView().findViewById(R.id.tabName);
+                        tabImage9.setImageBitmap(tabImage9Bitmap);
+                        tabName9.setText(R.string.sketch_8);
+
+                        ImageView tabImage10 = tabLayout.getTabAt(9).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName10 = tabLayout.getTabAt(9).getCustomView().findViewById(R.id.tabName);
+                        tabImage10.setImageBitmap(tabImage10Bitmap);
+                        tabName10.setText(R.string.sketch_9);
+
+                        ImageView tabImage11 = tabLayout.getTabAt(10).getCustomView().findViewById(R.id.tabImage);
+                        TextView tabName11 = tabLayout.getTabAt(10).getCustomView().findViewById(R.id.tabName);
+                        tabImage11.setImageBitmap(tabImage11Bitmap);
+                        tabName11.setText(R.string.b_w);
+                    }
+                });
+            }
+        }).start();
     }
 
     private boolean hasPermission(){
@@ -228,38 +347,41 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        String timeStamps = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        imageFileName = "JPEG_" + timeStamps + "_";
+        if (requestCode == GALLERY_PICKER_CODE && resultCode == RESULT_OK) {
+            String timeStamps = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            imageFileName = "JPEG_" + timeStamps + "_";
 
-        Uri uri = data.getData();
+            Uri uri = data.getData();
 
+            ContentResolver contentResolver = getContentResolver();
+            InputStream inputStream = null;
+            try {
+                inputStream = contentResolver.openInputStream(uri);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            imageBitmap = BitmapFactory.decodeStream(inputStream);
 
-        ContentResolver contentResolver = getContentResolver();
-        InputStream inputStream = null;
-        try {
-            inputStream = contentResolver.openInputStream(uri);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            //binding.imgLost.setImageBitmap(imageBitmap);
+            File compressedFile = new File(getExternalFilesDir(null), imageFileName + ".jpeg");
+            try {
+                FileOutputStream fos = new FileOutputStream(compressedFile);
+                fos.write(outputStream.toByteArray());
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            compressedUri = Uri.fromFile(compressedFile);
+
+            binding.ivTarget.setVisibility(View.VISIBLE);
+            binding.ivTarget.setImageBitmap(imageBitmap);
+            binding.chooseImageLayout.setVisibility(View.GONE);
+            binding.fixLayout.setVisibility(View.VISIBLE);
+            sketchImage = new SketchImage.Builder(this, imageBitmap).build();
         }
-        imageBitmap = BitmapFactory.decodeStream(inputStream);
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-        //binding.imgLost.setImageBitmap(imageBitmap);
-        File compressedFile = new File(getExternalFilesDir(null), imageFileName + ".jpeg");
-        try {
-            FileOutputStream fos = new FileOutputStream(compressedFile);
-            fos.write(outputStream.toByteArray());
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        compressedUri = Uri.fromFile(compressedFile);
-
-        binding.ivTarget.setVisibility(View.VISIBLE);
-        binding.ivTarget.setImageBitmap(imageBitmap);
-        binding.chooseImageLayout.setVisibility(View.GONE);
     }
 
     @Override

@@ -13,4 +13,12 @@
         android:contentDescription="@null"
         android:layout_marginBottom="5dp"/>
 
+    <TextView
+        android:id="@+id/tabName"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="Original"
+        android:textSize="11sp"
+        android:textAlignment="center"/>
+
 </LinearLayout>
