@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Uri compressedUri;
     private TabLayout tabLayout;
     private ProgressDialog progressDialog;
+    private Bitmap resultBitmap=null;
+    private Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,14 +94,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                binding.pb.setVisibility(View.VISIBLE);
+//                binding.pb.setVisibility(View.VISIBLE);
+                showCustomDialog("Please Wait...");
                 effectType = tabLayout.getSelectedTabPosition();
                 if (effectType == 0){
                     binding.tvPb.setText(String.format("%d %%", MAX_PROGRESS));
                     binding.simpleSeekBar.setMax(MAX_PROGRESS);
                     binding.simpleSeekBar.setProgress(MAX_PROGRESS);
                     binding.ivTarget.setImageBitmap(imageBitmap);
-                    binding.pb.setVisibility(View.GONE);
+//                    binding.pb.setVisibility(View.GONE);
+                    dialog.dismiss();
+                    binding.buttonLayout.setVisibility(View.GONE);
                 }else if (effectType == 1){
                     backgroundTasks(1,true,100);
                 }else if (effectType == 2){
@@ -143,7 +149,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                binding.pb.setVisibility(View.VISIBLE);
+//                binding.pb.setVisibility(View.VISIBLE);
+                showCustomDialog("Please wait...");
             }
 
             @Override
@@ -189,6 +196,38 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             }
         });
 
+        binding.saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageSaver.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
+
+            }
+        });
+
+        binding.resetBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resultBitmap = null;
+                binding.ivTarget.setVisibility(View.GONE);
+                binding.fixLayout.setVisibility(View.GONE);
+                binding.buttonLayout.setVisibility(View.GONE);
+                binding.chooseImageLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        binding.otherImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resultBitmap = null;
+                if (hasPermission()){
+                    openGallery();
+                }else {
+                    checkPermission();
+                }
+
+            }
+        });
+
     }
 
 
@@ -198,7 +237,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void run() {
                 // Perform heavy computations in the background
-                Bitmap resultBitmap;
                 if (status){
                       resultBitmap = sketchImage.getImageAs(type, MAX_PROGRESS);
                 }else {
@@ -216,12 +254,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                             binding.simpleSeekBar.setMax(MAX_PROGRESS);
                             binding.simpleSeekBar.setProgress(MAX_PROGRESS);
                             binding.ivTarget.setImageBitmap(resultBitmap);
-                            binding.pb.setVisibility(View.GONE);
+//                            binding.pb.setVisibility(View.GONE);
+                            dialog.dismiss();
+                            binding.buttonLayout.setVisibility(View.VISIBLE);
                         }else {
                             binding.ivTarget.setImageBitmap(resultBitmap);
-                            binding.pb.setVisibility(View.GONE);
+//                            binding.pb.setVisibility(View.GONE);
+                            dialog.dismiss();
                         }
-
                     }
                 });
             }
@@ -256,8 +296,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         binding.tvPb.setText(String.format("%d %%", MAX_PROGRESS));
                         binding.simpleSeekBar.setMax(MAX_PROGRESS);
                         binding.simpleSeekBar.setProgress(MAX_PROGRESS);
-                        binding.ivTarget.setImageBitmap(sketchImage1.getImageAs(effectType,
-                                MAX_PROGRESS));
+//                        binding.ivTarget.setImageBitmap(sketchImage1.getImageAs(effectType,
+//                                MAX_PROGRESS));
 
                         ImageView tabImage1 = tabLayout.getTabAt(0).getCustomView().findViewById(R.id.tabImage);
                         TextView tabName1 = tabLayout.getTabAt(0).getCustomView().findViewById(R.id.tabName);
@@ -380,6 +420,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             binding.ivTarget.setImageBitmap(imageBitmap);
             binding.chooseImageLayout.setVisibility(View.GONE);
             binding.fixLayout.setVisibility(View.VISIBLE);
+            binding.buttonLayout.setVisibility(View.GONE);
             sketchImage = new SketchImage.Builder(this, imageBitmap).build();
         }
     }
@@ -395,4 +436,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
               new AppSettingsDialog.Builder(this).build().show();
           }
     }
+
+    private void showCustomDialog(String text) {
+        dialog = new Dialog(MainActivity.this, R.style.CustomDialog);
+        dialog.setContentView(R.layout.custom_dialog);
+        TextView spinnertext = dialog.findViewById(R.id.spinnertext);
+        spinnertext.setText(text);
+        dialog.show();
+        dialog.setCancelable(false);
+    }
+
 }

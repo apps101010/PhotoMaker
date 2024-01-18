@@ -6,4 +6,9 @@
     </style>
 
     <style name="Theme.PhotoMaker" parent="Base.Theme.PhotoMaker" />
+
+    <style name="CustomDialog" parent="@style/Theme.AppCompat.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 </resources>
