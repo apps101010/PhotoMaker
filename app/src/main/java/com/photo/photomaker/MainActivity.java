@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Bitmap imageBitmap;
     private Uri compressedUri;
     private TabLayout tabLayout;
-    private ProgressDialog progressDialog;
     private Bitmap resultBitmap=null;
     private Dialog dialog;
 
@@ -70,10 +69,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Please Wait...");
-        progressDialog.setCancelable(false);
-
          tabLayout =  binding.tabLayout;
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));

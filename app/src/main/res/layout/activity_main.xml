@@ -10,7 +10,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/design_default_color_primary_dark" >
+        android:background="@color/mainColor" >
 
 
                 <TextView
@@ -18,9 +18,13 @@
                     android:layout_height="wrap_content"
                     android:text="@string/photo_sketch_maker"
                     android:layout_gravity="center"
+                    android:background="@drawable/border1"
                     android:textColor="@android:color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.2"
+                    android:padding="5dp"
+                    android:fontFamily="@font/londrina_sketch_regular"/>
 
 
     </androidx.appcompat.widget.Toolbar>
@@ -77,7 +81,7 @@
 
             <LinearLayout
                 android:id="@+id/chooseImageLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_centerInParent="true"
@@ -85,19 +89,27 @@
 
                 <ImageView
                     android:id="@+id/selectImage"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
                     android:maxHeight="10dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/select_image"
+                    android:src="@drawable/chooseimage"
                     android:layout_gravity="center" />
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/choose_image"
                     android:textAlignment="center"
+                    android:gravity="center"
+                    android:layout_gravity="center"
                     android:layout_marginTop="5dp"
+                    android:textSize="18dp"
+                    android:background="@drawable/border1"
+                    android:padding="5dp"
+                    android:textColor="@color/white"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/londrina_sketch_regular"
                     android:textStyle="bold"/>
 
             </LinearLayout>
@@ -138,6 +150,7 @@
             android:textSize="20sp"
             android:layout_width="match_parent"
             android:textAlignment="center"
+            android:visibility="gone"
             android:layout_height="wrap_content" />
 
         <SeekBar
@@ -145,6 +158,7 @@
             android:layout_width="match_parent"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            android:visibility="gone"
             android:layout_height="50dp" />
 
         <com.google.android.material.tabs.TabLayout

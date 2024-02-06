@@ -18,7 +18,7 @@
         android:orientation="vertical"
         android:layout_gravity="center"
         android:gravity="center"
-        android:background="@color/design_default_color_primary_dark">
+        android:background="@color/mainColor">
 
         <com.github.ybq.android.spinkit.SpinKitView
             android:id="@+id/spin_kit"

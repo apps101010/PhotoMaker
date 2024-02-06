@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">SketchMaker</string>
-    <string name="photo_sketch_maker">Sketch Maker</string>
-    <string name="choose_image">Choose Image</string>
+    <string name="app_name">Sketchify</string>
+    <string name="photo_sketch_maker">SKETCHIFY</string>
+    <string name="choose_image">Click Here To Choose Image</string>
     <string name="original">Original</string>
     <string name="sketch_1">Sketch 1</string>
     <string name="sketch_2">Sketch 2</string>
