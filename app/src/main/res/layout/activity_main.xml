@@ -10,21 +10,31 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/mainColor" >
+        android:background="@color/mainColor">
 
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/photo_sketch_maker"
-                    android:layout_gravity="center"
-                    android:background="@drawable/border1"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.2"
-                    android:padding="5dp"
-                    android:fontFamily="@font/londrina_sketch_regular"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/border1"
+            android:fontFamily="@font/londrina_sketch_regular"
+            android:letterSpacing="0.2"
+            android:padding="5dp"
+            android:text="@string/photo_sketch_maker"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:padding="10dp"
+            android:visibility="gone"
+            android:src="@drawable/save_image_icon"
+            android:background="@drawable/rounded_shape"/>
 
 
     </androidx.appcompat.widget.Toolbar>

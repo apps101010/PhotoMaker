@@ -22,6 +22,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.renderscript.Type;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -40,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
          tabLayout =  binding.tabLayout;
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
@@ -443,4 +448,31 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         dialog.setCancelable(false);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_saveimage) {
+            Toast.makeText(this, "save image button clicked", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.action_newimage) {
+
+            return true;
+        } else if (id == R.id.action_resetimage){
+            
+            return true;
+        }else if (id == R.id.action_exit){
+            
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
