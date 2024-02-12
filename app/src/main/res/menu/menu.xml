@@ -3,21 +3,17 @@
 
     <item
         android:id="@+id/action_saveimage"
-        android:icon="@drawable/save_image_icon"
         android:title="Save Image" />
     <item
         android:id="@+id/action_newimage"
-        android:icon="@drawable/add_image_icon"
         android:title="Choose New Image" />
 
     <item
         android:id="@+id/action_resetimage"
-        android:icon="@drawable/reload_image_icon"
         android:title="Reset" />
 
     <item
-        android:id="@+id/action_exit"
-        android:icon="@drawable/reload_image_icon"
-        android:title="Exit" />
+        android:id="@+id/action_more"
+        android:title="More Apps" />
 
 </menu>

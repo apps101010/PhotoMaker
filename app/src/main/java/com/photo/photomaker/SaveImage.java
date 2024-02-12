@@ -4,10 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -34,10 +36,10 @@ public class SaveImage {
                 directory.mkdirs();
             }
 
-            String fileName = "image_"+ System.currentTimeMillis() + ".jpg";
+            String fileName = "image_"+ System.currentTimeMillis() + ".png";
             File file = new File(directory, fileName);
             OutputStream stream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             stream.flush();
             stream.close();
             return file.getAbsolutePath();
@@ -53,7 +55,7 @@ public class SaveImage {
         values.put(MediaStore.Images.Media.DESCRIPTION, description);
         values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis());
         values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
 
         // Use RELATIVE_PATH and IS_PENDING for Android 10 and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -68,13 +70,20 @@ public class SaveImage {
                     try (OutputStream stream = context.getContentResolver().openOutputStream(insertUri)) {
                         if (stream != null) {
                             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                             stream.flush();
                             stream.close();
                         }
                     } finally {
                         values.put(MediaStore.Images.Media.IS_PENDING, 0);
                         context.getContentResolver().update(insertUri, values, null, null);
+
+                        MediaScannerConnection.scanFile(context,
+                                new String[]{imagePath}, null,
+                                (path, uri) -> {
+                                    Log.i("ExternalStorage", "Scanned " + path + ":");
+                                    Log.i("ExternalStorage", "-> uri=" + uri);
+                                });
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -85,5 +94,7 @@ public class SaveImage {
             values.put(MediaStore.Images.Media.DATA, imagePath);
             context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         }
+
+
     }
 }

@@ -26,52 +26,8 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
-            android:padding="10dp"
-            android:visibility="gone"
-            android:src="@drawable/save_image_icon"
-            android:background="@drawable/rounded_shape"/>
-
 
     </androidx.appcompat.widget.Toolbar>
-
-    <LinearLayout
-        android:id="@+id/buttonLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:layout_below="@+id/toolbar">
-
-        <Button
-            android:id="@+id/resetBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:layout_weight="1"
-            android:text="@string/reset"/>
-
-        <Button
-            android:id="@+id/saveBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="5dp"
-            android:text="@string/save"/>
-
-        <Button
-            android:id="@+id/otherImageBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/add_new"/>
-
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/imageLayout"
@@ -80,10 +36,9 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/buttonLayout"
+        android:layout_below="@+id/toolbar"
         android:background="@drawable/border"
         android:layout_above="@+id/fixLayout">
-
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -124,7 +79,6 @@
 
             </LinearLayout>
 
-
             <ImageView
                 android:id="@+id/iv_target"
                 android:layout_width="match_parent"
@@ -134,6 +88,17 @@
                 android:visibility="gone"
                 android:layout_centerInParent="true" />
 
+            <ImageView
+                android:id="@+id/saveImageIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:padding="10dp"
+                android:layout_alignParentEnd="true"
+                android:visibility="gone"
+                android:src="@drawable/save"
+                android:background="@drawable/rounded_shape"/>
+
             <ProgressBar
                 android:id="@+id/pb"
                 android:visibility="invisible"
@@ -142,6 +107,7 @@
                 android:layout_height="wrap_content" />
 
         </RelativeLayout>
+
 
     </LinearLayout>
 
@@ -177,7 +143,7 @@
             android:layout_height="wrap_content"
             app:tabSelectedTextColor="@android:color/white"
             app:tabTextColor="@android:color/white"
-            app:tabIndicatorColor="@color/design_default_color_on_secondary"
+            app:tabIndicatorColor="@color/black"
             app:tabIndicatorHeight="1dp"
             app:tabMode="scrollable"
             android:layout_marginBottom="10dp"

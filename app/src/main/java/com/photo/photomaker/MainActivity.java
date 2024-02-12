@@ -2,34 +2,27 @@ package com.photo.photomaker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
-import android.renderscript.Type;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.devs.sketchimage.SketchImage;
 import com.google.android.material.tabs.TabLayout;
@@ -42,7 +35,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private int effectType = SketchImage.ORIGINAL_TO_GRAY;
     private String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE};
     private String imageFileName = null;
+    private String visibility="GONE";
     private Bitmap imageBitmap;
     private Uri compressedUri;
     private TabLayout tabLayout;
@@ -95,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
 //                binding.pb.setVisibility(View.VISIBLE);
+                tab.getCustomView().findViewById(R.id.tabName).setBackground(getDrawable(R.drawable.black_border));
+                tab.getCustomView().findViewById(R.id.tabImage).setBackground(getDrawable(R.drawable.black_border_with_white));
                 showCustomDialog("Please Wait...");
                 effectType = tabLayout.getSelectedTabPosition();
                 if (effectType == 0){
@@ -104,7 +99,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     binding.ivTarget.setImageBitmap(imageBitmap);
 //                    binding.pb.setVisibility(View.GONE);
                     dialog.dismiss();
-                    binding.buttonLayout.setVisibility(View.GONE);
+                    visibility = "GONE";
+                    binding.saveImageIcon.setVisibility(View.GONE);
                 }else if (effectType == 1){
                     backgroundTasks(1,true,100);
                 }else if (effectType == 2){
@@ -112,17 +108,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 }else if (effectType == 3){
                     backgroundTasks(5,true,100);
                 }else if (effectType == 4){
-                    backgroundTasks(4,true,100);
+                    backgroundTasks(4,true,99);
                 }else if (effectType == 5){
                     backgroundTasks(6,true,100);
                 }else if (effectType == 6){
-                    backgroundTasks(7,true,100);
+                    backgroundTasks(7,true,99);
                 }else if (effectType == 7){
                     backgroundTasks(2,true,100);
                 }else if (effectType == 8){
-                    backgroundTasks(8,true,100);
+                    backgroundTasks(8,true,99);
                 }else if (effectType == 9){
-                    backgroundTasks(3,true,100);
+                    backgroundTasks(3,true,99);
                 }else{
                     backgroundTasks(0,true,100);
                 }
@@ -131,7 +127,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
+                 tab.getCustomView().findViewById(R.id.tabName).setBackground(getDrawable(R.drawable.border1));
+                 tab.getCustomView().findViewById(R.id.tabImage).setBackground(getDrawable(R.drawable.border));
             }
 
             @Override
@@ -196,37 +193,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             }
         });
 
-        binding.saveBtn.setOnClickListener(new View.OnClickListener() {
+        binding.saveImageIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                ImageSaver.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
-
                 SaveImage.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
-
-            }
-        });
-
-        binding.resetBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resultBitmap = null;
-                binding.ivTarget.setVisibility(View.GONE);
-                binding.fixLayout.setVisibility(View.GONE);
-                binding.buttonLayout.setVisibility(View.GONE);
-                binding.chooseImageLayout.setVisibility(View.VISIBLE);
-            }
-        });
-
-        binding.otherImageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resultBitmap = null;
-                if (hasPermission()){
-                    openGallery();
-                }else {
-                    checkPermission();
-                }
-
             }
         });
 
@@ -240,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             public void run() {
                 // Perform heavy computations in the background
                 if (status){
-                      resultBitmap = sketchImage.getImageAs(type, MAX_PROGRESS);
+                      resultBitmap = sketchImage.getImageAs(type, progress);
                 }else {
                       resultBitmap = sketchImage.getImageAs(type, progress);
 
@@ -258,7 +228,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                             binding.ivTarget.setImageBitmap(resultBitmap);
 //                            binding.pb.setVisibility(View.GONE);
                             dialog.dismiss();
-                            binding.buttonLayout.setVisibility(View.VISIBLE);
+                            visibility = "VISIBLE";
+                            binding.saveImageIcon.setVisibility(View.VISIBLE);
                         }else {
                             binding.ivTarget.setImageBitmap(resultBitmap);
 //                            binding.pb.setVisibility(View.GONE);
@@ -305,6 +276,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         TextView tabName1 = tabLayout.getTabAt(0).getCustomView().findViewById(R.id.tabName);
                         tabImage1.setImageResource(R.drawable.download);
                         tabName1.setText(R.string.original);
+                        tabImage1.setBackground(getDrawable(R.drawable.black_border_with_white));
+                        tabName1.setBackground(getDrawable(R.drawable.black_border));
 
                         ImageView tabImage2 = tabLayout.getTabAt(1).getCustomView().findViewById(R.id.tabImage);
                         TextView tabName2 = tabLayout.getTabAt(1).getCustomView().findViewById(R.id.tabName);
@@ -359,6 +332,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 });
             }
         }).start();
+    }
+
+    private void selectFirstTab() {
+        TabLayout.Tab firstTab = tabLayout.getTabAt(0);
+        if (firstTab != null) {
+            firstTab.select();
+        }
     }
 
     private boolean hasPermission(){
@@ -422,8 +402,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             binding.ivTarget.setImageBitmap(imageBitmap);
             binding.chooseImageLayout.setVisibility(View.GONE);
             binding.fixLayout.setVisibility(View.VISIBLE);
-            binding.buttonLayout.setVisibility(View.GONE);
+            visibility = "GONE";
+            binding.saveImageIcon.setVisibility(View.GONE);
             sketchImage = new SketchImage.Builder(this, imageBitmap).build();
+            selectFirstTab();
         }
     }
 
@@ -455,21 +437,49 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (visibility.equals("GONE")){
+            menu.findItem(R.id.action_saveimage).setVisible(false);
+            menu.findItem(R.id.action_newimage).setVisible(false);
+            menu.findItem(R.id.action_resetimage).setVisible(false);
+        }else {
+            menu.findItem(R.id.action_saveimage).setVisible(true);
+            menu.findItem(R.id.action_newimage).setVisible(true);
+            menu.findItem(R.id.action_resetimage).setVisible(true);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         int id = item.getItemId();
 
         if (id == R.id.action_saveimage) {
-            Toast.makeText(this, "save image button clicked", Toast.LENGTH_SHORT).show();
+            SaveImage.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
             return true;
         } else if (id == R.id.action_newimage) {
-
+            resultBitmap = null;
+            if (hasPermission()){
+                openGallery();
+            }else {
+                checkPermission();
+            }
             return true;
         } else if (id == R.id.action_resetimage){
-            
+            resultBitmap = null;
+            binding.ivTarget.setVisibility(View.GONE);
+            binding.fixLayout.setVisibility(View.GONE);
+            visibility = "GONE";
+            binding.chooseImageLayout.setVisibility(View.VISIBLE);
+            binding.saveImageIcon.setVisibility(View.GONE);
             return true;
-        }else if (id == R.id.action_exit){
-            
+        }else if (id == R.id.action_more){
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://play.google.com/store/apps/developer?id=Paki+Sol")));
+            }catch (ActivityNotFoundException e){
+                startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://play.google.com/store/apps/developer?id=Paki+Sol")));
+            }
             return true;
         }
 
