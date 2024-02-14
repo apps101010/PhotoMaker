@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class SaveImage {
-    public static void saveImageToGallery(Context context, Bitmap bitmap, String title, String description) {
+    public static boolean saveImageToGallery(Context context, Bitmap bitmap, String title, String description) {
         String savedImagePath = saveImageToInternalStorage(context, bitmap, title);
         if (savedImagePath != null) {
             // Add the image to the gallery
@@ -27,6 +27,7 @@ public class SaveImage {
         } else {
             Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show();
         }
+        return true;
     }
 
     private static String saveImageToInternalStorage(Context context, Bitmap bitmap, String title) {

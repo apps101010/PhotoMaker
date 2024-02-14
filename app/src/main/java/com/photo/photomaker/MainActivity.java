@@ -23,8 +23,17 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.devs.sketchimage.SketchImage;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.tabs.TabLayout;
 import com.photo.photomaker.databinding.ActivityMainBinding;
 
@@ -59,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private TabLayout tabLayout;
     private Bitmap resultBitmap=null;
     private Dialog dialog;
+    private AdView mAdView;
+    private InterstitialAd mInterstitialAd;
+    private boolean checkImageSave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +80,28 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
          tabLayout =  binding.tabLayout;
+
+        // Banner Ads Code
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+        // Interstitial Ads Code
+        InterstitialAd.load(this,getResources().getString(R.string.interstitial_ad_id), adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        // The mInterstitialAd reference will be null until
+                        // an ad is loaded.
+                        mInterstitialAd = interstitialAd;
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        // Handle the error
+                        mInterstitialAd = null;
+                    }
+                });
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
@@ -196,10 +230,31 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         binding.saveImageIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SaveImage.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
+                saveImageToGallery();
             }
         });
 
+    }
+
+    private void saveImageToGallery(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                checkImageSave = SaveImage.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
+
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (checkImageSave){
+                            Toast.makeText(MainActivity.this, "Image Saved To Gallery", Toast.LENGTH_SHORT).show();
+                        }else {
+                            Toast.makeText(MainActivity.this, "Image Not Saved", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
     }
 
 
@@ -456,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         int id = item.getItemId();
 
         if (id == R.id.action_saveimage) {
-            SaveImage.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
+            saveImageToGallery();
             return true;
         } else if (id == R.id.action_newimage) {
             resultBitmap = null;
