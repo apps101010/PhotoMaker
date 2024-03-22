@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Bitmap resultBitmap=null;
     private Dialog dialog;
     private AdView mAdView;
-    private InterstitialAd mInterstitialAd;
     private boolean checkImageSave;
 
     @Override
@@ -85,23 +84,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         mAdView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
-
-        // Interstitial Ads Code
-        InterstitialAd.load(this,getResources().getString(R.string.interstitial_ad_id), adRequest,
-                new InterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        // The mInterstitialAd reference will be null until
-                        // an ad is loaded.
-                        mInterstitialAd = interstitialAd;
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        // Handle the error
-                        mInterstitialAd = null;
-                    }
-                });
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
@@ -230,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         binding.saveImageIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveImageToGallery();
+                checkImageSave = SaveImage.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
             }
         });
 
@@ -511,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         int id = item.getItemId();
 
         if (id == R.id.action_saveimage) {
-            saveImageToGallery();
+            checkImageSave = SaveImage.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
             return true;
         } else if (id == R.id.action_newimage) {
             resultBitmap = null;
