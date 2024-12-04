@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.devs.sketchimage.SketchImage;
+import com.facebook.ads.Ad;
+import com.facebook.ads.AdError;
+import com.facebook.ads.AdSettings;
+import com.facebook.ads.AdSize;
+import com.facebook.ads.AudienceNetworkAds;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
@@ -71,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private AdView mAdView;
     private boolean checkImageSave;
 
+    private com.facebook.ads.AdView facebookAdView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +92,26 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         // Banner Ads Code
         mAdView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
+
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                super.onAdFailedToLoad(loadAdError);
+            }
+
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+            }
+        });
+
         mAdView.loadAd(adRequest);
+
+        AudienceNetworkAds.initialize(this);
+        AdSettings.addTestDevice("f9dce4eb-732f-4a2c-b7c2-d4073d9c585f");
+
+        loadFacebookAds();
+
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));
@@ -521,5 +549,39 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadFacebookAds(){
+
+        facebookAdView = new com.facebook.ads.AdView(this,"1335509634486802_1335516107819488", com.facebook.ads.AdSize.BANNER_HEIGHT_50);
+
+        facebookAdView.loadAd(
+                facebookAdView.buildLoadAdConfig()
+                        .withAdListener(new com.facebook.ads.AdListener() {
+                            @Override
+                            public void onError(Ad ad, AdError adError) {
+                                Log.d("FAN", "Ad failed to load: " + adError.getErrorMessage());
+                            }
+
+                            @Override
+                            public void onAdLoaded(Ad ad) {
+                                Log.d("FAN", "Ad loaded successfully.");
+                            }
+
+                            @Override
+                            public void onAdClicked(Ad ad) {
+                                Log.d("FAN", "Ad clicked.");
+                            }
+
+                            @Override
+                            public void onLoggingImpression(Ad ad) {
+                                Log.d("FAN", "Ad impression logged.");
+                            }
+                        })
+                        .build()
+        );
+
+        // Add the AdView to your container
+        binding.bottomLayout.addView(facebookAdView);
     }
 }
