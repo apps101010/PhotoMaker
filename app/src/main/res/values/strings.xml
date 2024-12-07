@@ -17,6 +17,5 @@
     <string name="save">Save</string>
     <string name="add_new">Add New</string>
     <string name="admob_id">ca-app-pub-9881909229934261~8744465039</string>
-<!--    <string name="banner_ad_id">ca-app-pub-9881909229934261/6039206802</string>-->
-    <string name="banner_ad_id">ca-app-pub-3940256099942544/9214589741</string>
+    <string name="banner_ad_id">ca-app-pub-9881909229934261/6039206802</string>
 </resources>

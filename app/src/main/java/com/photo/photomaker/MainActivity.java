@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                 super.onAdFailedToLoad(loadAdError);
+                loadFacebookAds();
             }
 
             @Override
@@ -108,9 +109,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         mAdView.loadAd(adRequest);
 
         AudienceNetworkAds.initialize(this);
-        AdSettings.addTestDevice("f9dce4eb-732f-4a2c-b7c2-d4073d9c585f");
+//        AdSettings.addTestDevice("415d9360-fc39-47cb-b0a2-d787c568b042");
 
-        loadFacebookAds();
+
 
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.custom_tab_layout));

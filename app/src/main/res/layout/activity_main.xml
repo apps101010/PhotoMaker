@@ -164,7 +164,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         ads:adSize="BANNER"
-        android:visibility="gone"
         ads:adUnitId="@string/banner_ad_id">
     </com.google.android.gms.ads.AdView>
 
