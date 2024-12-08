@@ -1,23 +1,70 @@
 package com.photo.photomaker;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SaveImage {
+
+    public static void saveImageWithProgress(Context context, Activity activity, Bitmap bitmap, String title, String description, InterstitialAd mInterstitialAd) {
+        ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("Saving image...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                String savedImagePath = saveImageToInternalStorage(context, bitmap, title);
+                if (savedImagePath != null) {
+                    addToGallery(context, savedImagePath, title, description);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                progressDialog.dismiss();
+                if (result) {
+                    Toast.makeText(context, "Image saved to gallery", Toast.LENGTH_SHORT).show();
+                    if (mInterstitialAd != null) {
+                        mInterstitialAd.show(activity);
+                    } else {
+                        Log.d("TAG", "The interstitial ad wasn't ready yet.");
+                    }
+                } else {
+                    Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }.execute();
+    }
+
     public static boolean saveImageToGallery(Context context, Bitmap bitmap, String title, String description) {
         String savedImagePath = saveImageToInternalStorage(context, bitmap, title);
         if (savedImagePath != null) {
@@ -29,6 +76,26 @@ public class SaveImage {
         }
         return true;
     }
+
+    private static void loadInterstitialAds(AdRequest adRequest, AtomicReference<InterstitialAd> mInterstitialAds, Context context) {
+        InterstitialAd.load(context, context.getString(R.string.interstitial_ad_id), adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("interstitial Ads", "Ads failed to load");
+                        mInterstitialAds.set(null); // Clear the reference
+                    }
+
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        super.onAdLoaded(interstitialAd);
+                        mInterstitialAds.set(interstitialAd); // Set the loaded ad
+                        Log.d("interstitial Ads", "Ads loaded");
+                    }
+                });
+    }
+
 
     private static String saveImageToInternalStorage(Context context, Bitmap bitmap, String title) {
         try {

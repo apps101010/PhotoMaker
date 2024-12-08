@@ -8,6 +8,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -53,6 +54,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private boolean checkImageSave;
 
     private com.facebook.ads.AdView facebookAdView;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -238,13 +241,35 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             }
         });
 
+        loadInterstitialAds(adRequest);
+
         binding.saveImageIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkImageSave = SaveImage.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
+                SaveImage.saveImageWithProgress(MainActivity.this,MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app",mInterstitialAd);
+
             }
         });
 
+    }
+
+    private void loadInterstitialAds(AdRequest adRequest) {
+        InterstitialAd.load(this, this.getString(R.string.interstitial_ad_id), adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("interstitial Ads", "Ads failed to load");
+                        mInterstitialAd = null; // Clear the reference
+                    }
+
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        super.onAdLoaded(interstitialAd);
+                        mInterstitialAd = interstitialAd; // Set the loaded ad
+                        Log.d("interstitial Ads", "Ads loaded");
+                    }
+                });
     }
 
     private void saveImageToGallery(){
@@ -522,7 +547,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         int id = item.getItemId();
 
         if (id == R.id.action_saveimage) {
-            checkImageSave = SaveImage.saveImageToGallery(MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app");
+            SaveImage.saveImageWithProgress(MainActivity.this,MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app",mInterstitialAd);
             return true;
         } else if (id == R.id.action_newimage) {
             resultBitmap = null;
