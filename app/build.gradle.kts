@@ -44,7 +44,7 @@ dependencies {
     implementation("pub.devrel:easypermissions:3.0.0")
     implementation("com.github.ybq:Android-SpinKit:1.4.0")
     implementation("com.google.android.gms:play-services-ads:22.6.0")
-    implementation("com.facebook.android:audience-network-sdk:6.18.0")
+    implementation("com.google.ads.mediation:inmobi:10.8.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

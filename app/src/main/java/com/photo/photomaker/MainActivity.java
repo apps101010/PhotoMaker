@@ -8,7 +8,6 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,18 +27,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.devs.sketchimage.SketchImage;
-import com.facebook.ads.Ad;
-import com.facebook.ads.AdError;
-import com.facebook.ads.AdSettings;
-import com.facebook.ads.AdSize;
-import com.facebook.ads.AudienceNetworkAds;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.tabs.TabLayout;
@@ -54,7 +45,6 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -79,9 +69,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Dialog dialog;
     private AdView mAdView;
     private boolean checkImageSave;
-
-    private com.facebook.ads.AdView facebookAdView;
     private InterstitialAd mInterstitialAd;
+    private AdRequest adRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,13 +83,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         // Banner Ads Code
         mAdView = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
+        adRequest = new AdRequest.Builder().build();
 
         mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                 super.onAdFailedToLoad(loadAdError);
-                loadFacebookAds();
             }
 
             @Override
@@ -110,9 +98,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         });
 
         mAdView.loadAd(adRequest);
-
-        AudienceNetworkAds.initialize(this);
-//        AdSettings.addTestDevice("415d9360-fc39-47cb-b0a2-d787c568b042");
 
 
 
@@ -247,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void onClick(View v) {
                 SaveImage.saveImageWithProgress(MainActivity.this,MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app",mInterstitialAd);
-
+                loadInterstitialAds(adRequest);
             }
         });
 
@@ -548,6 +533,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         if (id == R.id.action_saveimage) {
             SaveImage.saveImageWithProgress(MainActivity.this,MainActivity.this,resultBitmap,"Sketch Image","This is the image created by sketch maker app",mInterstitialAd);
+            loadInterstitialAds(adRequest);
             return true;
         } else if (id == R.id.action_newimage) {
             resultBitmap = null;
@@ -575,39 +561,5 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void loadFacebookAds(){
-
-        facebookAdView = new com.facebook.ads.AdView(this,"1335509634486802_1335516107819488", com.facebook.ads.AdSize.BANNER_HEIGHT_50);
-
-        facebookAdView.loadAd(
-                facebookAdView.buildLoadAdConfig()
-                        .withAdListener(new com.facebook.ads.AdListener() {
-                            @Override
-                            public void onError(Ad ad, AdError adError) {
-                                Log.d("FAN", "Ad failed to load: " + adError.getErrorMessage());
-                            }
-
-                            @Override
-                            public void onAdLoaded(Ad ad) {
-                                Log.d("FAN", "Ad loaded successfully.");
-                            }
-
-                            @Override
-                            public void onAdClicked(Ad ad) {
-                                Log.d("FAN", "Ad clicked.");
-                            }
-
-                            @Override
-                            public void onLoggingImpression(Ad ad) {
-                                Log.d("FAN", "Ad impression logged.");
-                            }
-                        })
-                        .build()
-        );
-
-        // Add the AdView to your container
-        binding.bottomLayout.addView(facebookAdView);
     }
 }
